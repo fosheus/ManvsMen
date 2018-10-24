@@ -1,0 +1,279 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Fichiers sources">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Fichiers de ressources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="States">
+      <UniqueIdentifier>{e1eb7bf1-70de-4ae3-b580-4365302ac31d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Managers">
+      <UniqueIdentifier>{2e78e74b-31c7-4402-a536-913e6a1d5891}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Entities">
+      <UniqueIdentifier>{0547dd0d-fffc-4cd1-a2df-3a414a3b1d65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Weapons">
+      <UniqueIdentifier>{7b3925d3-c7aa-439a-854f-f34ebb947f9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Characters">
+      <UniqueIdentifier>{ca6471e0-4eb9-4940-b269-bc33e487bcbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{f3134f63-6aa8-47d3-af2f-0e32959eb4a0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="TileMap.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="GameState.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="MainMenuState.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="SplashState.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="StateMachine.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="MapManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="GameoverState.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="WeaponEntity.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="MedikitEntity.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="KevlarEntity.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Weapon.cpp">
+      <Filter>Weapons</Filter>
+    </ClCompile>
+    <ClCompile Include="ShotgunWeapon.cpp">
+      <Filter>Weapons</Filter>
+    </ClCompile>
+    <ClCompile Include="RifleWeapon.cpp">
+      <Filter>Weapons</Filter>
+    </ClCompile>
+    <ClCompile Include="Character.cpp">
+      <Filter>Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="BackpackEntity.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="GunWeapon.cpp">
+      <Filter>Weapons</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="SniperWeapon.cpp">
+      <Filter>Weapons</Filter>
+    </ClCompile>
+    <ClCompile Include="SelectWeaponState.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="AStar.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="AVL.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Collider.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="MapGenerator.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Point.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="MatchSettingsState.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="PauseMenuState.cpp">
+      <Filter>States</Filter>
+    </ClCompile>
+    <ClCompile Include="DesertEagleWeapon.cpp">
+      <Filter>Weapons</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationManager.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyBindingManager.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingsParser.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Bullet.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="TileMap.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="DEFINITIONS.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="GameState.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="MainMenuState.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="StateMachine.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="SplashState.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="MapManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="GameoverState.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="KevlarEntity.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="MedikitEntity.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="WeaponEntity.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Weapon.h">
+      <Filter>Weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="ShotgunWeapon.h">
+      <Filter>Weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="RifleWeapon.h">
+      <Filter>Weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="Character.h">
+      <Filter>Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="BackpackEntity.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="GunWeapon.h">
+      <Filter>Weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="SniperWeapon.h">
+      <Filter>Weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectWeaponState.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="AStar.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Collider.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="AVL.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Point.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="MapGenerator.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="MatchSettingsState.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="PauseMenuState.h">
+      <Filter>States</Filter>
+    </ClInclude>
+    <ClInclude Include="DesertEagleWeapon.h">
+      <Filter>Weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigurationManager.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyBindingManager.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="SettingsParser.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
+</Project>
