@@ -96,9 +96,10 @@ void GameState::Init()
 void GameState::HandleInput()
 {
 	sf::Event event;
+	
 	while (this->_data->window.pollEvent(event))
 	{
-
+		
 		if (event.type == sf::Event::Closed) {
 			this->_data->machine.AddState(StateRef(new MainMenuState(this->_data)), true);
 		}

@@ -7,22 +7,13 @@ Game::Game(std::string settingsFileName)
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 8;
 
-	int width, height,fullscreen;
+	//load settings
+	loadSettings(settingsFileName);
+	loadKeyBinding(settingsFileName);
+	//load keyBinding
 
-	if (this->_data->settings.loadFromFile(settingsFileName)) {
-		
-		this->_data->settings.get("width", width);
-		this->_data->settings.get("height", height);
-		this->_data->settings.get("fullscreen", fullscreen);
-	}
-	else {
-		std::cout << "Error loading settings file!" << std::endl;
-		width = SCREEN_WIDTH;
-		height = SCREEN_HEIGHT;
-		fullscreen = FULLSCREEN;
-	}
 
-	this->_data->window.create(sf::VideoMode(width, height), GAME_NAME, sf::Style::Close | sf::Style::Titlebar| (sf::Style::Fullscreen*fullscreen),settings);
+	this->_data->window.create(sf::VideoMode(_data->config.width, _data->config.height), GAME_NAME, sf::Style::Close | sf::Style::Titlebar| (sf::Style::Fullscreen*_data->config.fullscreen),settings);
 	
 
 	this->_data->machine.AddState(StateRef(new SplashState(this->_data)));
@@ -32,6 +23,56 @@ Game::Game(std::string settingsFileName)
 
 Game::~Game()
 {
+}
+
+bool Game::loadSettings(std::string settingsFileName)
+{
+
+	if (settings.loadFromFile(settingsFileName)) {
+
+		settings.get("Width", _data->config.width);
+		settings.get("Height", _data->config.height);
+		settings.get("Fullscreen", _data->config.fullscreen);
+	}
+	else {
+		std::cout << "Error loading settings file!" << std::endl;
+		_data->config.width = SCREEN_WIDTH;
+		_data->config.height = SCREEN_HEIGHT;
+		_data->config.fullscreen = FULLSCREEN;
+	}
+	return true;
+}
+
+bool Game::loadKeyBinding(std::string settingsFileName)
+{
+	std::string strKey;
+	KeyBindingManager::ErrorCode error;
+	if (settings.loadFromFile(settingsFileName)) {
+		settings.get("Up", strKey);
+		_data->keys.changeInputForAction("Up", strKey);
+		settings.get("Left", strKey);
+		_data->keys.changeInputForAction("Left", strKey);
+		settings.get("Right", strKey);
+		_data->keys.changeInputForAction("Right", strKey);
+		settings.get("Down", strKey);
+		_data->keys.changeInputForAction("Down", strKey);
+		settings.get("PickUp", strKey);
+		_data->keys.changeInputForAction("PickUp", strKey);
+		settings.get("Shoot", strKey);
+		_data->keys.changeInputForAction("Shoot", strKey);
+		settings.get("Aim", strKey);
+		_data->keys.changeInputForAction("Aim", strKey);
+		settings.get("Reload", strKey);
+		_data->keys.changeInputForAction("Reload", strKey);
+		settings.get("Run", strKey);
+		_data->keys.changeInputForAction("Run", strKey);
+		settings.get("Pause", strKey);
+		_data->keys.changeInputForAction("Pause", strKey);
+		settings.get("Back", strKey);
+		_data->keys.changeInputForAction("Back", strKey);
+		
+	}
+	return true;
 }
 
 void Game::Run()

@@ -1,42 +1,45 @@
 #pragma once
+#include "KeyConversionManager.h"
+#include <SFML/Window/Event.hpp>
+#include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/Mouse.hpp>
 
-#include <map>
-#include <string>
-#include <SFML\Graphics.hpp>
+
+
 class KeyBindingManager
 {
-private :
-	union input_u {
-		sf::Keyboard key;
-		sf::Mouse mouse;
-	};
 public :
-	struct input_t {
-		input_u input;
-		int type;
+	enum ErrorCode {
+		NO_ERROR,
+		UNKNOWN_ACTION,
+		UNKOWN_INPUT
+	};
+	enum InputType {
+		KEYBOARD,
+		MOUSE
+	};
+	struct Input {
+		InputType type;
+		sf::Event::EventType eventType;
+		sf::Keyboard::Key key;
+		sf::Mouse::Button mouse;
 	};
 public:
-	enum Action {
-		Up,
-		Down,
-		Left,
-		Right,
-		Pick,
-		Reload,
-		Run,
-		Shoot,
-		Aim
-	};
-	
-	std::map<Action, input_t> actionInput;
-	
-public:
-	KeyBindingManager(std::string filename);
 	KeyBindingManager();
-	~KeyBindingManager();
+	int changeInputForAction(std::string action, Input input);
+	int changeInputForAction(std::string action, std::string input);
+	bool testEvent(std::string action, sf::Event event);
+	bool testInputDown(std::string action);
 
+
+	~KeyBindingManager();
 private:
-	void loadDefault();
-	void loadFromFile(std::string filename);
+	void initBaseInputs();
+	
+private:
+	std::map<std::string, Input> inputs;
+	std::vector<std::string> authorizedInputs;
+	KeyConversionManager keyConversion;
+	
 };
 

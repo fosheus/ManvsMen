@@ -36,7 +36,7 @@ void Player::update(float multiplier) {
 		pickWeapon = 0;
 		this->aiming = 0;
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) Up = 1;
+		/*if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) Up = 1;
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) Left = 1;
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) Down = 1;
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) Right = 1;
@@ -47,7 +47,19 @@ void Player::update(float multiplier) {
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::E) && holdPickWeapon == false) {
 			pickWeapon = 1; holdPickWeapon = true;
 		}
-		else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::E)) holdPickWeapon = false;
+		else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::E)) holdPickWeapon = false;*/
+		if (_data->keys.testInputDown("Up")) Up = 1;
+		if (_data->keys.testInputDown("Left")) Left = 1;
+		if (_data->keys.testInputDown("Down")) Down = 1;
+		if (_data->keys.testInputDown("Right")) Right = 1;
+		if (_data->keys.testInputDown("Shoot")) Shoot = 1;
+		if (_data->keys.testInputDown("Aim")) this->aiming = 1;
+		if (_data->keys.testInputDown("Reload")) Reload = 1;
+		if (_data->keys.testInputDown("Run")) Run = 1;
+		if (_data->keys.testInputDown("PickUp") && holdPickWeapon == false) {
+			pickWeapon = 1; holdPickWeapon = true;
+		}
+		else if (!_data->keys.testInputDown("PickUp")) holdPickWeapon = false;
 		
 
 		

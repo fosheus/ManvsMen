@@ -8,7 +8,8 @@
 #include "InputManager.h"
 #include "MapManager.h"
 #include "SettingsParser.h"
-
+#include "KeyBindingManager.h"
+#include "ConfigurationManager.h"
 
 struct GameData {
 	StateMachine machine;
@@ -16,7 +17,9 @@ struct GameData {
 	AssetManager assets;
 	InputManager inputs;
 	MapManager map;
-	SettingsParser settings;
+	
+	KeyBindingManager keys;
+	ConfigurationManager config;
 
 };
 
@@ -27,12 +30,16 @@ public:
 	Game(std::string settingsFileName);
 	~Game();
 
+private:
+	void Run();
+	bool loadSettings(std::string settingsFileName);
+	bool loadKeyBinding(std::string settingsFileName);
 private :
 	const float dt = 1.0f / 60.0f;
 	sf::Clock _clock;
 	GameDataRef _data = std::make_shared<GameData>();
-
-	void Run();
+	SettingsParser settings;
+	
 
 };
 
