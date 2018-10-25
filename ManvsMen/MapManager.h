@@ -23,7 +23,7 @@ public:
 	sf::Vector2f getFirstPathCellTopLeft();
 	sf::Vector2f getRandomPathPoint();
 	sf::Vector2f getRandomPathPointInOrOutRange(float range, bool inRange,sf::Vector2f position);
-
+	sf::Vector2f getMatrixPosToRealPos(sf::Vector2f mapPosition);
 
 	int** getMatrix() {	return map->getMatrix(); }
 	sf::Vector2u getMatrixSize() { if (map) { return sf::Vector2u(map->getWidth(), map->getHeight()); } return sf::Vector2u(0, 0); }

@@ -297,7 +297,7 @@ void Character::hurtCharacter(Character * character,int damages)
 
 
 /*WEAPON*/
-std::vector<Bullet> Character::getBullets() {
+std::vector<Bullet>& Character::getBullets() {
 	if (weapon) {
 		return weapon->getBullets();
 	} 

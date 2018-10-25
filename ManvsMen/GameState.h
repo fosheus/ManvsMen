@@ -77,6 +77,7 @@ private:
 	void enemiesUpdate(float multiplier);
 	void collisionManagement(float multiplier);
 	void moveCharactersOpposite(Character * character1, Character * character2,float multiplier);
+	void moveCharacterAwayFromPosition(Character * character, sf::Vector2f position, float multiplier);
 	void playerBulletsCollisionEnemies(float multiplier);
 	void playerUpdateZoom(float multiplier);
 	void playerCollideEntities(float mulitplier);

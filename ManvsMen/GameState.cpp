@@ -465,6 +465,10 @@ void GameState::collisionManagement(float multiplier) {
 		sf::RectangleShape enemyMinBounds = enemies[i]->getMinBounds();
 		if (Utils::circleCollisionDetection(player.getPosition(), enemies[i]->getPosition(), CHARACTER_RADIUS, CHARACTER_RADIUS)) {
 			moveCharactersOpposite(&player, enemies[i],multiplier);
+			if (!_data->map.isEntityOnPathCell(player.getPosition())) {
+				//get cell position 
+				moveCharacterAwayFromPosition(&player, _data->map.getMatrixPosToRealPos(player.getPosition()),multiplier);
+			}
 		}
 		for (size_t j = 0; j < enemies[i]->getBullets().size(); j++)
 		{
@@ -499,5 +503,20 @@ void GameState::moveCharactersOpposite(Character* character1, Character* charact
 	character2->setPosition(c2x, c2y);
 
 
+}
+
+void GameState::moveCharacterAwayFromPosition(Character * character, sf::Vector2f position, float multiplier)
+{
+	// Distance between ball centers
+	float fDistance = Utils::distance(character->getPosition(), position);
+
+	// Calculate displacement required
+	float fOverlap = 0.5f * (fDistance - CHARACTER_RADIUS - CHARACTER_RADIUS);
+
+	// Displace Current Ball away from collision
+	float c1x = character->getX() - fOverlap * (character->getX() - position.x) / fDistance;
+	float c1y = character->getY() - fOverlap * (character->getY() - position.y) / fDistance;
+	character->setPosition(c1x, c1y);
+	
 }
 

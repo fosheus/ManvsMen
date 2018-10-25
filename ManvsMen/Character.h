@@ -132,7 +132,7 @@ public:
 
 	/*weapon*/
 	Weapon* getWeapon() { return weapon; }
-	std::vector<Bullet> getBullets();
+	std::vector<Bullet>& getBullets();
 	size_t getBulletNumber();
 	int getMagazine();
 	int getAmmo();

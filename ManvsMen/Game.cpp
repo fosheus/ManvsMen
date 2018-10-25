@@ -33,6 +33,7 @@ bool Game::loadSettings(std::string settingsFileName)
 		settings.get("Width", _data->config.width);
 		settings.get("Height", _data->config.height);
 		settings.get("Fullscreen", _data->config.fullscreen);
+		_data->config.fullscreen = _data->config.fullscreen > 0 ? 1 : 0;
 	}
 	else {
 		std::cout << "Error loading settings file!" << std::endl;
