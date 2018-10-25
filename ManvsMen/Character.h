@@ -18,14 +18,14 @@
 #define TEXTURE_SCALE 0.5
 #define TEXTURE_CENTER sf::Vector2f(96,120)
 #define TEXTURE_NUMBER 2
-#define TEXTURE_TOP_LEFT_OFFSET sf::Vector2f((35-TEXTURE_CENTER.x)*TEXTURE_SCALE,(35-TEXTURE_CENTER.y)*TEXTURE_SCALE)
-#define TEXTURE_WEAPON_POINT_OFFSET sf::Vector2f((291-TEXTURE_CENTER.x)*TEXTURE_SCALE,(150-TEXTURE_CENTER.y)*TEXTURE_SCALE)
-#define TEXTURE_HITBOX_SIZE sf::Vector2f(205*TEXTURE_SCALE,155*TEXTURE_SCALE)
+#define TEXTURE_TOP_LEFT_OFFSET sf::Vector2f((35.0f-TEXTURE_CENTER.x)*TEXTURE_SCALE,(35.0f-TEXTURE_CENTER.y)*TEXTURE_SCALE)
+#define TEXTURE_WEAPON_POINT_OFFSET sf::Vector2f((291.0f-TEXTURE_CENTER.x)*TEXTURE_SCALE,(150.0f-TEXTURE_CENTER.y)*TEXTURE_SCALE)
+#define TEXTURE_HITBOX_SIZE sf::Vector2f(205.0f*TEXTURE_SCALE,155.0f*TEXTURE_SCALE)
 #define BULLETSHAPE_WIDTH 30
 #define BULLETSHAPE_HEIGHT 6
 #define DEFAULT_SPEED 5
 #define HEAL_PROCESS_TIMEOUT 120
-#define CHARACTER_RADIUS 90*TEXTURE_SCALE
+#define CHARACTER_RADIUS 90.0f*TEXTURE_SCALE
 
 class Character 
 {
@@ -132,8 +132,8 @@ public:
 
 	/*weapon*/
 	Weapon* getWeapon() { return weapon; }
-	std::vector<Bullet>& getBullets();
-	int getBulletNumber();
+	std::vector<Bullet> getBullets();
+	size_t getBulletNumber();
 	int getMagazine();
 	int getAmmo();
 
@@ -144,7 +144,7 @@ public:
 	/*OPERATIONS*/
 	
 	std::string getWeaponInfo();
-	sf::RectangleShape Character::getMinBounds();
+	sf::RectangleShape getMinBounds();
 	//Entity* pickAndDropEntity(Entity* entity);
 	bool outOfBounds(sf::Vector2f minWorldBounds, sf::Vector2f maxWorldBounds);
 	void hurtCharacter(Character* character,int damages);

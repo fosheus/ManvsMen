@@ -24,7 +24,7 @@ public:
 	int findtop(nodeptr &);
 	nodeptr findmin(nodeptr);
 	nodeptr findmax(nodeptr);
-	bool AVL::isempty(nodeptr &);
+	bool isempty(nodeptr &);
 	void makeempty(nodeptr &);
 	void copy(nodeptr &, nodeptr &);
 	nodeptr nodecopy(nodeptr &);

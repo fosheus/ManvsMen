@@ -37,16 +37,16 @@ public:
 	MapGenerator(size_t height, size_t width, size_t blocWidth, size_t blocHeight);
 
 	int** getMatrix() { return matrix; }
-	int getWidth() { return width; }
-	int getHeight() { return height;}
-	int getBlockSize() { return blocWidth; }
+	size_t getWidth() { return width; }
+	size_t getHeight() { return height;}
+	size_t getBlockSize() { return blocWidth; }
 	
 	Point getWorldPosition(Point mapPosition);
 	Point getMapPosition(Point worldPosition);
 	
 	Point getRandomPathPoint();
-	Point MapGenerator::getRandomPathPointInRange(int range,Point point);
-	Point MapGenerator::getRandomPathPointOutRange(int range, Point point);
+	Point getRandomPathPointInRange(int range,Point point);
+	Point getRandomPathPointOutRange(int range, Point point);
 
 	bool isPositionAPath(Point p);
 	Point getFirstPathCellTopLeft();

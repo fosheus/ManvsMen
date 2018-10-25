@@ -346,7 +346,7 @@ void GameState::playerUpdateZoom(float multiplier)
 void GameState::playerBulletsCollisionEnemies(float multiplier) {
 	int k = 0;
 	std::vector<int> indexBulletToErase;
-	for each (Bullet var in player.getBullets())
+	for (Bullet var : player.getBullets())
 	{
 
 		sf::RectangleShape r;
@@ -373,7 +373,7 @@ void GameState::playerBulletsCollisionEnemies(float multiplier) {
 
 		k++;
 	}
-	for each (int index in indexBulletToErase) {
+	for (int index : indexBulletToErase) {
 		if (index < player.getBullets().size()) {
 			player.getBullets().erase(player.getBullets().begin() + index);
 		}

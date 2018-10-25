@@ -142,7 +142,7 @@ void MapGenerator::addAdjToSameTree(int x, int y, int **visitedMatrix, int curre
 		int cellValue = x%width + y * width;
 		tree.insert(cellValue, roots[currentTree]);
 		visitedMatrix[x][y] = 1;
-		for each (Point var in getNeighbours(Point(x, y)))
+		for (Point var : getNeighbours(Point(x, y)))
 		{
 			addAdjToSameTree(var.x, var.y, visitedMatrix, currentTree);
 		}

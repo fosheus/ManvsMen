@@ -14,7 +14,7 @@ private:
 public:
 	MapManager();
 
-	void MapManager::generateMap(int width, int height, int blockSize);
+	void generateMap(int width, int height, int blockSize);
 	std::vector<sf::Vector2f> getPathFromTo(sf::Vector2f from, sf::Vector2f to);
 	std::vector<sf::Vector2f> getPathFromToAvoidingPlayer(sf::Vector2f from, sf::Vector2f to, sf::Vector2f playerPos, float playerViewFieldRadius);
 	bool isEntityInMapBounds(sf::Vector2f entityPos);
@@ -22,7 +22,7 @@ public:
 	sf::Vector2f getClosestPathCell(sf::Vector2f entityPos);
 	sf::Vector2f getFirstPathCellTopLeft();
 	sf::Vector2f getRandomPathPoint();
-	sf::Vector2f MapManager::getRandomPathPointInOrOutRange(float range, bool inRange,sf::Vector2f position);
+	sf::Vector2f getRandomPathPointInOrOutRange(float range, bool inRange,sf::Vector2f position);
 
 
 	int** getMatrix() {	return map->getMatrix(); }

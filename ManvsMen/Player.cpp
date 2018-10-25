@@ -273,7 +273,7 @@ void Player::draw(sf::RenderWindow &window) {
 	characterSprite.setRotation(-this->angle);
 	window.draw(characterSprite);
 	if (weapon != NULL) {
-		std::vector<Bullet>& bullets = getBullets();
+		std::vector<Bullet> bullets = getBullets();
 		for (size_t i = 0; i < bullets.size(); i++)
 		{
 			bulletShape.setRotation(-bullets[i].getRotation());

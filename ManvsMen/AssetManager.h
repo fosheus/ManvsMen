@@ -10,9 +10,9 @@ public:
 	AssetManager() {}
 	~AssetManager() {}
 
-	const sf::Texture& AssetManager::GetImage(const std::string& filename);
-	const sf::Font& AssetManager::GetFont(const std::string & filename);
-	const sf::SoundBuffer* AssetManager::GetSound(const std::string & filename);
+	const sf::Texture& GetImage(const std::string& filename);
+	const sf::Font& GetFont(const std::string & filename);
+	const sf::SoundBuffer* GetSound(const std::string & filename);
 
 
 private :
