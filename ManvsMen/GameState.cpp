@@ -44,7 +44,6 @@ void GameState::Init()
 
 
 	focus = true;
-	map.load(sf::Vector2u(BLOCKSIZE, BLOCKSIZE), this->_data->map.getMatrix(), MAP_WIDTH, MAP_HEIGHT);
 
 	srand((unsigned int)time(NULL));
 	sf::Vector2f playerPos = sf::Vector2f(this->_data->map.getFirstPathCellTopLeft());
@@ -149,6 +148,8 @@ void GameState::Update(float dt)
 
 void GameState::Draw(float dt)
 {
+	
+	map.load(sf::Vector2u(BLOCKSIZE, BLOCKSIZE), this->_data->map.getMatrix(), MAP_WIDTH, MAP_HEIGHT, player.getPosition());
 
 	float reloadingProgress = player.getReloadingProgress();
 	//CLEAR AND SET WINDOW//
@@ -166,7 +167,10 @@ void GameState::Draw(float dt)
 	//DRAW ENTITIES//
 	for (size_t i = 0; i < entities.size(); i++)
 	{
-		this->_data->window.draw(*entities[i]);
+		//check if in player field of view
+		if (entityIsInPlayerFieldOfView(entities[i]->getPosition())) {
+			this->_data->window.draw(*entities[i]);
+		}
 	}
 	//DRAW PLAYER//
 	player.draw(this->_data->window);
@@ -182,7 +186,9 @@ void GameState::Draw(float dt)
 		else {
 			enemies[i]->getSprite().setColor(sf::Color::Red);
 		}
-		enemies[i]->draw(this->_data->window);
+		if (entityIsInPlayerFieldOfView(enemies[i]->getPosition())) {
+			enemies[i]->draw(this->_data->window);
+		}
 
 		//DRAW HEALTHBAR//
 		float pHealth = enemies[i]->getPercentHealth();
@@ -518,5 +524,13 @@ void GameState::moveCharacterAwayFromPosition(Character * character, sf::Vector2
 	float c1y = character->getY() - fOverlap * (character->getY() - position.y) / fDistance;
 	character->setPosition(c1x, c1y);
 	
+}
+
+bool GameState::entityIsInPlayerFieldOfView(sf::Vector2f& entity)
+{
+	if (Utils::distance(entity, player.getPosition()) < MAIN_VIEW_WIDTH /2.0f) {
+		return true;
+	}
+	return false;
 }
 
