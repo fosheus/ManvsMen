@@ -249,8 +249,11 @@ void Enemy::updatePosition(float multiplier) {
 					seenPositionStack.push(targetPlayer->getPosition());
 				}
 				if (weapon->getShootRange() >= distance*0.8) {
-					moveForward(multiplier);
+					
 					shoot();
+					if (weapon->getShootRange() < distance * 0.3) {
+						moveForward(multiplier);
+					}
 				}
 				else {
 					shooting = false;
