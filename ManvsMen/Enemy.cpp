@@ -280,6 +280,9 @@ void Enemy::updatePosition(float multiplier) {
 
 					if (weapon->getShootRange() >= distance*0.8) {
 						shoot();
+						if (weapon->getShootRange() < distance*0.3f) {
+							moveForward(multiplier);
+						}
 					}
 					else {
 						shooting = false;

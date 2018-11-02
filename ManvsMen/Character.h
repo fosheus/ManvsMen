@@ -113,7 +113,7 @@ public:
 	bool isShooting() { return shooting; }
 	bool isAiming() { return aiming; }
 
-	const sf::Vector2f& getPosition() { return sf::Vector2f(x, y); }
+	sf::Vector2f getPosition() { return sf::Vector2f(x, y); }
 	void setPosition(sf::Vector2f position) { x = position.x; y = position.y; }
 	void setPosition(float x, float y);
 	void setRotation(float angle);
