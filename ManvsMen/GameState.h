@@ -8,10 +8,13 @@
 #include "Enemy.h"
 #include "Entity.h"
 #include "GameMenu.h"
+#include "Segment.h"
+#include "IntersectionPoint.h"
 #include "WeaponEntity.h"
 #include "MedikitEntity.h"
 #include "KevlarEntity.h"
 #include "BackpackEntity.h"
+
 #include "RifleWeapon.h"
 #include "ShotgunWeapon.h"
 #include "SniperWeapon.h"
@@ -42,6 +45,12 @@ private:
 	GameDataRef _data;
 	TileMap map;
 	sf::Clock _clock;
+
+	sf::Mutex mutex;
+	sf::Thread fovThread;
+	bool fovThreadStarted;
+	sf::Vector2f playerPositionForFOVRendering;
+	std::map<float, IntersectionPoint> intersectionPoints;
 
 	bool Running;
 	bool displayMenu;
@@ -83,6 +92,8 @@ private:
 	void spawnEnemy();
 	void spawnWeapon(sf::Vector2f position, Weapon* weapon);
 	void spawnBackback( Character* character);
+	IntersectionPoint* getIntersection(Segment ray, Segment segment);
+	void fovOperator();
 
 
 };

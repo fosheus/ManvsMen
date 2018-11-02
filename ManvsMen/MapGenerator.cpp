@@ -51,6 +51,8 @@ MapGenerator::MapGenerator(size_t width, size_t height, size_t blocWidth, size_t
 		}
 		removeDiagonal();
 
+		optimizeRendering();
+
 	}
 
 }
@@ -199,6 +201,23 @@ void MapGenerator::removeDiagonal()
 	}
 }
 
+void MapGenerator::optimizeRendering()
+{
+	for (int i = 1; i < width-1; i++) {
+		for (int j = 1; j < height-1; j++) {
+			if (matrix[i][j] == WALL) {
+				if ((matrix[i - 1][j] == WALL || matrix[i - 1][j] == CONCRETE) &&
+					(matrix[i + 1][j] == WALL || matrix[i + 1][j] == CONCRETE) &&
+					(matrix[i][j + 1] == WALL || matrix[i][j + 1] == CONCRETE) &&
+					(matrix[i][j - 1] == WALL || matrix[i][j - 1] == CONCRETE)) {
+					matrix[i][j] = CONCRETE;
+				}
+
+			}
+		}
+	}
+}
+
 bool MapGenerator::isPositionAPath(Point p) {
 	if (p.x < 0 || p.x >= width || p.y < 0 || p.y >= height) {
 		return false;
@@ -211,7 +230,7 @@ bool MapGenerator::isPositionAPath(Point p) {
 Point MapGenerator::getFirstPathCellTopLeft() {
 	Point p(0, 0);
 	int i = 0;
-	while (matrix[p.x][p.y]==WALL) {
+	while (matrix[p.x][p.y]==WALL || matrix[p.x][p.y] == CONCRETE) {
 		if (i % 2 == 0) {
 			p.x += 1;
 		}

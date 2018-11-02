@@ -6,6 +6,7 @@ Game::Game(std::string settingsFileName)
 {
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 8;
+	
 
 	int width, height,fullscreen;
 
@@ -20,10 +21,11 @@ Game::Game(std::string settingsFileName)
 		width = SCREEN_WIDTH;
 		height = SCREEN_HEIGHT;
 		fullscreen = FULLSCREEN;
-	}
+	}
+
 
 	this->_data->window.create(sf::VideoMode(width, height), GAME_NAME, sf::Style::Close | sf::Style::Titlebar| (sf::Style::Fullscreen*fullscreen),settings);
-	
+	_data->window.setVerticalSyncEnabled(true);
 
 	this->_data->machine.AddState(StateRef(new SplashState(this->_data)));
 

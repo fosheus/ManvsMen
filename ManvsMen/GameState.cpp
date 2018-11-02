@@ -3,9 +3,12 @@
 #include "MainMenuState.h"
 #include "GameoverState.h"
 #include "PauseMenuState.h"
+#include <set>
+#include <algorithm>
+#include "Vector2fComparator.h"
 
 
-GameState::GameState(GameDataRef data, Weapon::WeaponType playerWeapon) :_data(data),map(data),player(data)
+GameState::GameState(GameDataRef data, Weapon::WeaponType playerWeapon) :_data(data),map(data),player(data),fovThread(&GameState::fovOperator,this)
 {
 	this->_data->map.generateMap(MAP_WIDTH, MAP_HEIGHT, BLOCKSIZE);
 	this->playerInitialWeaponType = playerWeapon;
@@ -13,6 +16,8 @@ GameState::GameState(GameDataRef data, Weapon::WeaponType playerWeapon) :_data(d
 
 GameState::~GameState()
 {
+	fovThreadStarted = false;
+	fovThread.wait();
 }
 
 void GameState::Init()
@@ -91,6 +96,9 @@ void GameState::Init()
 
 	Running = true;
 	displayMenu = false;
+
+	//thread fov
+	fovThread.launch();
 }
 
 void GameState::HandleInput()
@@ -161,7 +169,44 @@ void GameState::Draw(float dt)
 
 	//DRAW MAP//
 	this->_data->window.draw(map);
+	
+	//DRAW FOV//
+	
+	std::map<float, IntersectionPoint>::iterator it;
+	float distance = 0.0f;
+	float multiplier = 0.0f;
+	mutex.lock();
+	if (intersectionPoints.size()>0) {
+		for (it = std::next(intersectionPoints.begin(), 1); it != intersectionPoints.end(); it++) {
 
+			sf::VertexArray varray(sf::Triangles, 3);
+			auto prev = std::prev(it, 1);
+			varray[0].position = sf::Vector2f(prev->second.x, prev->second.y);
+			distance = Utils::distance(varray[0].position, playerPositionForFOVRendering);
+			multiplier = 1- distance / (MAIN_VIEW_WIDTH / 2.0f);
+			varray[0].color = sf::Color(255*multiplier, 255*multiplier, 128*multiplier, 50);
+
+			varray[1].position = playerPositionForFOVRendering;
+
+			varray[2].position = sf::Vector2f(it->second.x, it->second.y);
+			distance = Utils::distance(varray[2].position, playerPositionForFOVRendering);
+			multiplier = 1 - distance / (MAIN_VIEW_WIDTH / 2.0f);
+			varray[2].color = sf::Color(255 * multiplier, 255 * multiplier, 128 * multiplier, 50);
+			_data->window.draw(varray);
+		}
+		sf::VertexArray lastTriangle(sf::Triangles, 3);
+		lastTriangle[0].position = sf::Vector2f(intersectionPoints.begin()->second.x, intersectionPoints.begin()->second.y);
+		lastTriangle[2].position = sf::Vector2f(std::prev(intersectionPoints.end(), 1)->second.x, std::prev(intersectionPoints.end(), 1)->second.y);
+		lastTriangle[1].position = playerPositionForFOVRendering;
+		lastTriangle[0].color = sf::Color(255, 255, 128, 50);
+		lastTriangle[1].color = sf::Color(255, 255, 128, 50);
+		lastTriangle[2].color = sf::Color(255, 255, 128, 50);
+		
+		_data->window.draw(lastTriangle);
+
+	}
+	mutex.unlock();
+	
 	//DRAW ENTITIES//
 	for (size_t i = 0; i < entities.size(); i++)
 	{
@@ -319,6 +364,136 @@ void GameState::spawnBackback( Character * character)
 	Entity* backpack = new BackpackEntity(this->_data, character->getPosition(),entities);
 
 	this->entities.push_back(backpack);
+}
+
+IntersectionPoint * GameState::getIntersection(Segment ray, Segment segment)
+{
+	float r_px = ray.a.x;
+	float r_py = ray.a.y;
+	float r_dx = ray.b.x - ray.a.x;
+	float r_dy = ray.b.y - ray.a.y;
+
+	float s_px = segment.a.x;
+	float s_py = segment.a.y;
+	float s_dx = segment.b.x - segment.a.x;
+	float s_dy = segment.b.y - segment.a.y;
+
+	float r_mag = sqrt(r_dx*r_dx + r_dy * r_dy);
+	float s_mag = sqrt(s_dx*s_dx + s_dy * s_dy);
+
+	if (r_dx / r_mag == s_dx / s_mag && r_dy / r_mag == s_dy / s_mag) {
+		return NULL;
+	}
+	float T2 = (r_dx*(s_py - r_py) + r_dy * (r_px - s_px)) / (s_dx*r_dy - s_dy * r_dx);
+	float T1 = (s_px + s_dx * T2 - r_px) / r_dx;
+
+	if (T1 < 0)return NULL;
+	if (T2 < 0 || T2>1) return NULL;
+
+	return new IntersectionPoint(r_px + r_dx * T1, r_py + r_dy * T1, T1);
+
+}
+
+void GameState::fovOperator()
+{
+	fovThreadStarted = true;
+	while (fovThreadStarted) {
+
+		std::vector<Segment> segments;
+		std::vector<sf::Vector2f> points;
+		sf::Vector2f playerPositionAtThreadStart = player.getPosition();
+		for (int i = 0; i < MAP_WIDTH; i++) {
+			for (int j = 0; j < MAP_HEIGHT; j++) {
+
+				float x = i * BLOCKSIZE;
+				float y = j * BLOCKSIZE;
+				if (!_data->map.isEntityOnPathCell(sf::Vector2f(x, y))) {
+					if (x >= playerPositionAtThreadStart.x - MAIN_VIEW_WIDTH / 2.0f &&
+						x <= playerPositionAtThreadStart.x + MAIN_VIEW_WIDTH / 2.0f &&
+						y <= playerPositionAtThreadStart.y + MAIN_VIEW_HEIGHT / 2.0f &&
+						y >= playerPositionAtThreadStart.y - MAIN_VIEW_HEIGHT / 2.0f)
+					{
+						points.push_back(sf::Vector2f(x, y));
+						points.push_back(sf::Vector2f(x + BLOCKSIZE, y));
+						points.push_back(sf::Vector2f(x, y + BLOCKSIZE));
+						points.push_back(sf::Vector2f(x + BLOCKSIZE, y + BLOCKSIZE));
+
+						segments.push_back(Segment(sf::Vector2f(x, y), sf::Vector2f(x + BLOCKSIZE, y)));
+						segments.push_back(Segment(sf::Vector2f(x + BLOCKSIZE, y), sf::Vector2f(x + BLOCKSIZE, y + BLOCKSIZE)));
+						segments.push_back(Segment(sf::Vector2f(x + BLOCKSIZE, y + BLOCKSIZE), sf::Vector2f(x, y + BLOCKSIZE)));
+						segments.push_back(Segment(sf::Vector2f(x, y + BLOCKSIZE), sf::Vector2f(x, y)));
+					}
+				}
+
+			}
+		}
+
+		//create view bounds segments
+		sf::Vector2f topLeft(playerPositionAtThreadStart.x - MAIN_VIEW_WIDTH / 2.0f, playerPositionAtThreadStart.y - MAIN_VIEW_HEIGHT / 2.0f);
+		sf::Vector2f topRight(playerPositionAtThreadStart.x + MAIN_VIEW_WIDTH / 2.0f, playerPositionAtThreadStart.y - MAIN_VIEW_HEIGHT / 2.0f);
+		sf::Vector2f botLeft(playerPositionAtThreadStart.x - MAIN_VIEW_WIDTH / 2.0f, playerPositionAtThreadStart.y + MAIN_VIEW_HEIGHT / 2.0f);
+		sf::Vector2f botRight(playerPositionAtThreadStart.x + MAIN_VIEW_WIDTH / 2.0f, playerPositionAtThreadStart.y + MAIN_VIEW_HEIGHT / 2.0f);
+
+		points.push_back(topLeft);
+		points.push_back(topRight);
+		points.push_back(botLeft);
+		points.push_back(botRight);
+
+		segments.push_back(Segment(topLeft, topRight));
+		segments.push_back(Segment(topRight, botRight));
+		segments.push_back(Segment(botRight, botLeft));
+		segments.push_back(Segment(botLeft, topLeft));
+
+
+		std::set<sf::Vector2f, Vector2fComparator> uniquePoints;
+		unsigned int size = points.size();
+		for (unsigned i = 0; i < size; i++) {
+			uniquePoints.insert(points[i]);
+		}
+		points.assign(uniquePoints.begin(), uniquePoints.end());
+
+		std::vector<float> uniqueAngles;
+		for (int i = 0; i < points.size(); i++) {
+			float angle = atan2(points[i].y - playerPositionAtThreadStart.y, points[i].x - playerPositionAtThreadStart.x);
+			uniqueAngles.push_back(angle - 0.001f);
+			uniqueAngles.push_back(angle);
+			uniqueAngles.push_back(angle + 0.001f);
+		}
+
+		std::sort(uniqueAngles.begin(), uniqueAngles.end());
+		std::map<float, IntersectionPoint> intersects;
+		for (int i = 0; i < uniqueAngles.size(); i++) {
+			float dx = cos(uniqueAngles[i]);
+			float dy = sin(uniqueAngles[i]);
+
+			Segment ray(sf::Vector2f(playerPositionAtThreadStart.x, playerPositionAtThreadStart.y), sf::Vector2f(playerPositionAtThreadStart.x + dx, playerPositionAtThreadStart.y + dy));
+
+			IntersectionPoint* closestIntersect = NULL;
+			for (int j = 0; j < segments.size(); j++) {
+				IntersectionPoint*intersect = getIntersection(ray, segments[j]);
+				if (intersect == NULL) continue;
+				if (closestIntersect == NULL || (intersect->coeff < closestIntersect->coeff)) {
+					delete closestIntersect;
+					closestIntersect = intersect;
+				}
+				else {
+					delete intersect;
+				}
+			}
+			intersects[uniqueAngles[i]] = *closestIntersect;
+			delete closestIntersect;
+		}
+
+		std::map<float, IntersectionPoint>::iterator it;
+		mutex.lock();
+		intersectionPoints.clear();
+		for (it = intersects.begin(); it != intersects.end();it++) {
+			intersectionPoints.emplace(*it);
+		}
+		playerPositionForFOVRendering = playerPositionAtThreadStart;
+		mutex.unlock();
+
+	}
 }
 
 

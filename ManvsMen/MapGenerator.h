@@ -10,7 +10,8 @@ class MapGenerator
 public :
 	enum Cell_Type {
 		WALL = 0,
-		PATH = 1
+		PATH = 1,
+		CONCRETE = 2
 	};
 
 private :
@@ -31,6 +32,7 @@ private :
 	void addAdjToSameTree(int x, int y, int **visitedMatrix, int currentTree);
 	std::vector<Point> getNeighbours(Point point);
 	void removeDiagonal();
+	void optimizeRendering();
 public:
 
 
@@ -50,6 +52,8 @@ public:
 
 	bool isPositionAPath(Point p);
 	Point getFirstPathCellTopLeft();
+
+	
 	~MapGenerator();
 };
 
