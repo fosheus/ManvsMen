@@ -44,11 +44,11 @@ void PauseMenuState::HandleInput()
 				this->_data->machine.RemoveState();
 			}
 			if (this->_data->inputs.IsSpriteClicked(_restartButton, sf::Mouse::Left, _data->window)) {
-				this->_data->machine.RemoveState();
+				this->_data->machine.RemoveCurrentLastPausedState();
 				this->_data->machine.AddState(StateRef(new SelectWeaponState(_data)));
 			}
 			if (this->_data->inputs.IsSpriteClicked(_mainMenuButton, sf::Mouse::Left, _data->window)) {
-				this->_data->machine.RemoveState();
+				this->_data->machine.RemoveCurrentLastPausedState();
 				this->_data->machine.AddState(StateRef(new MainMenuState(_data)));
 			}
 		}

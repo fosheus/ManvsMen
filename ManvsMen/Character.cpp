@@ -199,7 +199,7 @@ bool Character::hurt(int damages) {
 			this->health -= damagestakenBody;
 		}
 		else {
-			int delta = (damages*0.6) - protection;
+			int delta = (int)(damages*0.6f) - protection;
 			protection = 0;
 			health -= delta + damagestakenBody;
 
@@ -301,9 +301,10 @@ std::vector<Bullet>& Character::getBullets() {
 	if (weapon) {
 		return weapon->getBullets();
 	} 
-	return std::vector<Bullet>();
+	std::vector<Bullet> empty;
+	return empty;
 }
-int Character::getBulletNumber() {
+size_t Character::getBulletNumber() {
 	if (weapon) {
 		return weapon->getBullets().size();
 	} return 0;

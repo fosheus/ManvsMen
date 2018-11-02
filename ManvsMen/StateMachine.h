@@ -16,7 +16,7 @@ public:
 
 	void AddState(StateRef newState, bool isReplacing = true);
 	void RemoveState();
-
+	void RemoveCurrentLastPausedState();
 	void ProcessStateChanges();
 
 	StateRef& GetActiveState();
@@ -26,6 +26,7 @@ private:
 	StateRef _newState;
 
 	bool _isRemoving;
+	bool _isRemovingPaused;
 	bool _isAdding;
 	bool _isReplacing;
 	

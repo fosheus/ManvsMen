@@ -3,9 +3,12 @@
 #include "MainMenuState.h"
 #include "GameoverState.h"
 #include "PauseMenuState.h"
+#include <set>
+#include <algorithm>
+#include "Vector2fComparator.h"
 
 
-GameState::GameState(GameDataRef data, Weapon::WeaponType playerWeapon) :_data(data),map(data),player(data)
+GameState::GameState(GameDataRef data, Weapon::WeaponType playerWeapon) :_data(data),map(data),player(data),fovThread(&GameState::fovOperator,this)
 {
 	this->_data->map.generateMap(MAP_WIDTH, MAP_HEIGHT, BLOCKSIZE);
 	this->playerInitialWeaponType = playerWeapon;
@@ -13,13 +16,20 @@ GameState::GameState(GameDataRef data, Weapon::WeaponType playerWeapon) :_data(d
 
 GameState::~GameState()
 {
+	fovThreadStarted = false;
+	fovThread.wait();
 }
 
 void GameState::Init()
 {
+	//set window and view settings
 	mainView.setSize(sf::Vector2f(MAIN_VIEW_WIDTH, MAIN_VIEW_HEIGHT));
 	this->_data->window.setView(mainView);
 	
+	//load map in the tilemap renderer
+	map.load(sf::Vector2u(BLOCKSIZE, BLOCKSIZE), this->_data->map.getMatrix(), this->_data->map.getMatrixSize().x, this->_data->map.getMatrixSize().y);
+
+	//load hud
 	killCountDisplay.setFont(this->_data->assets.GetFont(ARIAL_FONT));
 	enemyNumberDisplay.setFont(this->_data->assets.GetFont(ARIAL_FONT));
 	textFps.setFont(this->_data->assets.GetFont(ARIAL_FONT));
@@ -44,7 +54,6 @@ void GameState::Init()
 
 
 	focus = true;
-	map.load(sf::Vector2u(BLOCKSIZE, BLOCKSIZE), this->_data->map.getMatrix(), MAP_WIDTH, MAP_HEIGHT);
 
 	srand((unsigned int)time(NULL));
 	sf::Vector2f playerPos = sf::Vector2f(this->_data->map.getFirstPathCellTopLeft());
@@ -91,15 +100,21 @@ void GameState::Init()
 
 	Running = true;
 	displayMenu = false;
+
+	//thread fov
+	fovThread.launch();
 }
 
 void GameState::HandleInput()
 {
 	sf::Event event;
+	
 	while (this->_data->window.pollEvent(event))
 	{
-
+		
 		if (event.type == sf::Event::Closed) {
+			fovThreadStarted = false;
+			fovThread.wait();
 			this->_data->machine.AddState(StateRef(new MainMenuState(this->_data)), true);
 		}
 		if (event.type == sf::Event::Resized) {
@@ -139,6 +154,8 @@ void GameState::Update(float dt)
 			sf::Texture tex;
 			tex.create(windowSize.x, windowSize.y);
 			tex.update(_data->window);
+			fovThreadStarted = false;
+			fovThread.wait();
 			this->_data->machine.AddState(StateRef(new GameoverState(this->_data, tex.copyToImage())),true);
 		}
 
@@ -148,6 +165,7 @@ void GameState::Update(float dt)
 
 void GameState::Draw(float dt)
 {
+	
 
 	float reloadingProgress = player.getReloadingProgress();
 	//CLEAR AND SET WINDOW//
@@ -161,11 +179,63 @@ void GameState::Draw(float dt)
 
 	//DRAW MAP//
 	this->_data->window.draw(map);
+	
+	//DRAW FOV//
+	
+	std::map<float, IntersectionPoint>::iterator it;
+	float distance = 0.0f;
+	float multiplier = 0.0f;
+	mutex.lock();
+	if (intersectionPoints.size()>0) {
+		for (it = std::next(intersectionPoints.begin(), 1); it != intersectionPoints.end(); it++) {
 
+			sf::VertexArray varray(sf::Triangles, 3);
+			auto prev = std::prev(it, 1);
+			varray[0].position = sf::Vector2f(prev->second.x, prev->second.y);
+			distance = Utils::distance(varray[0].position, playerPositionForFOVRendering);
+			multiplier = 1 - distance / (mainView.getSize().x / 2.0f);
+			if (multiplier < 0) multiplier = 0;
+			varray[0].color = sf::Color(255*multiplier, 255*multiplier, 128*multiplier, 50);
+			varray[1].position = playerPositionForFOVRendering;
+			varray[1].color = sf::Color(255 , 255 , 128 , 50);
+
+			varray[2].position = sf::Vector2f(it->second.x, it->second.y);
+			distance = Utils::distance(varray[2].position, playerPositionForFOVRendering);
+			multiplier = 1 - distance / (mainView.getSize().x / 2.0f);
+			if (multiplier < 0) multiplier = 0;
+			varray[2].color = sf::Color(255 * multiplier, 255 * multiplier, 128 * multiplier, 50);
+			_data->window.draw(varray);
+		}
+		sf::VertexArray lastTriangle(sf::Triangles, 3);
+
+		lastTriangle[0].position = sf::Vector2f(intersectionPoints.begin()->second.x, intersectionPoints.begin()->second.y);
+		distance = Utils::distance(lastTriangle[0].position, playerPositionForFOVRendering);
+		multiplier = 1 - distance / (mainView.getSize().x / 2.0f);
+		if (multiplier < 0) multiplier = 0;
+		lastTriangle[0].color = sf::Color(255*multiplier, 255*multiplier, 128*multiplier, 50);
+
+		lastTriangle[1].position = playerPositionForFOVRendering;
+		lastTriangle[1].color = sf::Color(255, 255, 128, 50);
+
+		lastTriangle[2].position = sf::Vector2f(std::prev(intersectionPoints.end(), 1)->second.x, std::prev(intersectionPoints.end(), 1)->second.y);
+		distance = Utils::distance(lastTriangle[2].position, playerPositionForFOVRendering);
+		multiplier = 1 - distance / (mainView.getSize().x / 2.0f);
+		if (multiplier < 0) multiplier = 0;
+		lastTriangle[2].color = sf::Color(255 * multiplier, 255 * multiplier, 128 * multiplier, 50);
+
+		
+		_data->window.draw(lastTriangle);
+
+	}
+	mutex.unlock();
+	
 	//DRAW ENTITIES//
 	for (size_t i = 0; i < entities.size(); i++)
 	{
-		this->_data->window.draw(*entities[i]);
+		//check if in player field of view
+		if (entityIsInPlayerFieldOfView(entities[i]->getPosition())) {
+			this->_data->window.draw(*entities[i]);
+		}
 	}
 	//DRAW PLAYER//
 	player.draw(this->_data->window);
@@ -175,19 +245,15 @@ void GameState::Draw(float dt)
 	healthBar.setFillColor(sf::Color::Red);
 	for (size_t i = 0; i < enemies.size(); i++)
 	{
-		if (enemies[i]->targetInViewField(player.getPosition())) {
-			enemies[i]->getSprite().setColor(sf::Color::Green);
+		if (entityIsInPlayerFieldOfView(enemies[i]->getPosition())) {
+			enemies[i]->draw(this->_data->window);
+			//DRAW HEALTHBAR//
+			float pHealth = enemies[i]->getPercentHealth();
+			healthBar.setSize(sf::Vector2f(HEALTHMAXSIZE.x*pHealth, HEALTHMAXSIZE.y));
+			healthBar.setPosition(sf::Vector2f(enemies[i]->getPosition().x - healthBar.getSize().x / 2, enemies[i]->getPosition().y - 20));
+			this->_data->window.draw(healthBar);
 		}
-		else {
-			enemies[i]->getSprite().setColor(sf::Color::Red);
-		}
-		enemies[i]->draw(this->_data->window);
-
-		//DRAW HEALTHBAR//
-		float pHealth = enemies[i]->getPercentHealth();
-		healthBar.setSize(sf::Vector2f(HEALTHMAXSIZE.x*pHealth, HEALTHMAXSIZE.y));
-		healthBar.setPosition(sf::Vector2f(enemies[i]->getPosition().x - healthBar.getSize().x / 2, enemies[i]->getPosition().y - 20));
-		this->_data->window.draw(healthBar);
+	
 
 	}
 	healthBar.setFillColor(sf::Color::Green);
@@ -258,6 +324,17 @@ void GameState::Draw(float dt)
 	this->_data->window.display();
 }
 
+void GameState::Pause()
+{
+	fovThreadStarted = false;
+	fovThread.wait();
+}
+
+void GameState::Resume()
+{
+	fovThread.launch();
+}
+
 void GameState::spawnEnemy() {
 	Enemy* enemy = new Enemy(this->_data);
 	enemy->setHealth(DEFAULT_HEATLH);
@@ -321,6 +398,140 @@ void GameState::spawnBackback( Character * character)
 	this->entities.push_back(backpack);
 }
 
+IntersectionPoint * GameState::getIntersection(Segment ray, Segment segment)
+{
+	float r_px = ray.a.x;
+	float r_py = ray.a.y;
+	float r_dx = ray.b.x - ray.a.x;
+	float r_dy = ray.b.y - ray.a.y;
+
+	float s_px = segment.a.x;
+	float s_py = segment.a.y;
+	float s_dx = segment.b.x - segment.a.x;
+	float s_dy = segment.b.y - segment.a.y;
+
+	float r_mag = sqrt(r_dx*r_dx + r_dy * r_dy);
+	float s_mag = sqrt(s_dx*s_dx + s_dy * s_dy);
+
+	if (r_dx / r_mag == s_dx / s_mag && r_dy / r_mag == s_dy / s_mag) {
+		return NULL;
+	}
+	float T2 = (r_dx*(s_py - r_py) + r_dy * (r_px - s_px)) / (s_dx*r_dy - s_dy * r_dx);
+	float T1 = (s_px + s_dx * T2 - r_px) / r_dx;
+
+	if (T1 < 0)return NULL;
+	if (T2 < 0 || T2>1) return NULL;
+
+	return new IntersectionPoint(r_px + r_dx * T1, r_py + r_dy * T1, T1);
+
+}
+
+void GameState::fovOperator()
+{
+	fovThreadStarted = true;
+	while (fovThreadStarted) {
+
+		std::vector<Segment> segments;
+		std::vector<sf::Vector2f> points;
+		sf::Vector2f playerPositionAtThreadStart = player.getPosition();
+		for (int i = 0; i < MAP_WIDTH; i++) {
+			for (int j = 0; j < MAP_HEIGHT; j++) {
+
+				float x = i * BLOCKSIZE;
+				float y = j * BLOCKSIZE;
+				if (!_data->map.isEntityOnPathCell(sf::Vector2f(x, y))) {
+					if (x >= playerPositionAtThreadStart.x - mainView.getSize().x / 2.0f &&
+						x <= playerPositionAtThreadStart.x + mainView.getSize().x / 2.0f &&
+						y <= playerPositionAtThreadStart.y + mainView.getSize().y / 2.0f &&
+						y >= playerPositionAtThreadStart.y - mainView.getSize().y / 2.0f)
+					{
+						points.push_back(sf::Vector2f(x, y));
+						points.push_back(sf::Vector2f(x + BLOCKSIZE, y));
+						points.push_back(sf::Vector2f(x, y + BLOCKSIZE));
+						points.push_back(sf::Vector2f(x + BLOCKSIZE, y + BLOCKSIZE));
+
+						segments.push_back(Segment(sf::Vector2f(x, y), sf::Vector2f(x + BLOCKSIZE, y)));
+						segments.push_back(Segment(sf::Vector2f(x + BLOCKSIZE, y), sf::Vector2f(x + BLOCKSIZE, y + BLOCKSIZE)));
+						segments.push_back(Segment(sf::Vector2f(x + BLOCKSIZE, y + BLOCKSIZE), sf::Vector2f(x, y + BLOCKSIZE)));
+						segments.push_back(Segment(sf::Vector2f(x, y + BLOCKSIZE), sf::Vector2f(x, y)));
+					}
+				}
+
+			}
+		}
+
+		//create view bounds segments
+		float x_minus = playerPositionAtThreadStart.x - mainView.getSize().x / 2.0f >= 0 ? playerPositionAtThreadStart.x - mainView.getSize().x / 2.0f : 0;
+		float y_minus = playerPositionAtThreadStart.y - mainView.getSize().y / 2.0f >= 0 ? playerPositionAtThreadStart.y - mainView.getSize().y / 2.0f : 0;
+		float x_plus = playerPositionAtThreadStart.x + mainView.getSize().x / 2.0f  <= MAP_WIDTH*BLOCKSIZE ? playerPositionAtThreadStart.x + mainView.getSize().x / 2.0f : MAP_WIDTH * BLOCKSIZE;
+		float y_plus = playerPositionAtThreadStart.y + mainView.getSize().y / 2.0f  <= MAP_HEIGHT*BLOCKSIZE ? playerPositionAtThreadStart.y + mainView.getSize().y / 2.0f : MAP_HEIGHT * BLOCKSIZE;
+		sf::Vector2f topLeft(x_minus , y_minus);
+		sf::Vector2f topRight(x_plus, y_minus);
+		sf::Vector2f botLeft(x_minus, y_plus);
+		sf::Vector2f botRight(x_plus, y_plus);
+
+		points.push_back(topLeft);
+		points.push_back(topRight);
+		points.push_back(botLeft);
+		points.push_back(botRight);
+
+		segments.push_back(Segment(topLeft, topRight));
+		segments.push_back(Segment(topRight, botRight));
+		segments.push_back(Segment(botRight, botLeft));
+		segments.push_back(Segment(botLeft, topLeft));
+
+
+		std::set<sf::Vector2f, Vector2fComparator> uniquePoints;
+		unsigned int size = points.size();
+		for (unsigned i = 0; i < size; i++) {
+			uniquePoints.insert(points[i]);
+		}
+		points.assign(uniquePoints.begin(), uniquePoints.end());
+
+		std::vector<float> uniqueAngles;
+		for (int i = 0; i < points.size(); i++) {
+			float angle = atan2(points[i].y - playerPositionAtThreadStart.y, points[i].x - playerPositionAtThreadStart.x);
+			uniqueAngles.push_back(angle - 0.001f);
+			uniqueAngles.push_back(angle);
+			uniqueAngles.push_back(angle + 0.001f);
+		}
+
+		std::sort(uniqueAngles.begin(), uniqueAngles.end());
+		std::map<float, IntersectionPoint> intersects;
+		for (int i = 0; i < uniqueAngles.size(); i++) {
+			float dx = cos(uniqueAngles[i]);
+			float dy = sin(uniqueAngles[i]);
+
+			Segment ray(sf::Vector2f(playerPositionAtThreadStart.x, playerPositionAtThreadStart.y), sf::Vector2f(playerPositionAtThreadStart.x + dx, playerPositionAtThreadStart.y + dy));
+
+			IntersectionPoint* closestIntersect = NULL;
+			for (int j = 0; j < segments.size(); j++) {
+				IntersectionPoint*intersect = getIntersection(ray, segments[j]);
+				if (intersect == NULL) continue;
+				if (closestIntersect == NULL || (intersect->coeff < closestIntersect->coeff)) {
+					delete closestIntersect;
+					closestIntersect = intersect;
+				}
+				else {
+					delete intersect;
+				}
+			}
+			intersects[uniqueAngles[i]] = *closestIntersect;
+			delete closestIntersect;
+		}
+
+		std::map<float, IntersectionPoint>::iterator it;
+		mutex.lock();
+		intersectionPoints.clear();
+		for (it = intersects.begin(); it != intersects.end();it++) {
+			intersectionPoints.emplace(*it);
+		}
+		playerPositionForFOVRendering = playerPositionAtThreadStart;
+		mutex.unlock();
+
+	}
+}
+
 
 void GameState::playerUpdateZoom(float multiplier)
 {	
@@ -345,7 +556,7 @@ void GameState::playerUpdateZoom(float multiplier)
 void GameState::playerBulletsCollisionEnemies(float multiplier) {
 	int k = 0;
 	std::vector<int> indexBulletToErase;
-	for each (Bullet var in player.getBullets())
+	for (Bullet var : player.getBullets())
 	{
 
 		sf::RectangleShape r;
@@ -372,7 +583,7 @@ void GameState::playerBulletsCollisionEnemies(float multiplier) {
 
 		k++;
 	}
-	for each (int index in indexBulletToErase) {
+	for (int index : indexBulletToErase) {
 		if (index < player.getBullets().size()) {
 			player.getBullets().erase(player.getBullets().begin() + index);
 		}
@@ -464,6 +675,10 @@ void GameState::collisionManagement(float multiplier) {
 		sf::RectangleShape enemyMinBounds = enemies[i]->getMinBounds();
 		if (Utils::circleCollisionDetection(player.getPosition(), enemies[i]->getPosition(), CHARACTER_RADIUS, CHARACTER_RADIUS)) {
 			moveCharactersOpposite(&player, enemies[i],multiplier);
+			if (!_data->map.isEntityOnPathCell(player.getPosition())) {
+				//get cell position 
+				moveCharacterAwayFromPosition(&player, _data->map.getMatrixPosToRealPos(player.getPosition()),multiplier);
+			}
 		}
 		for (size_t j = 0; j < enemies[i]->getBullets().size(); j++)
 		{
@@ -498,5 +713,47 @@ void GameState::moveCharactersOpposite(Character* character1, Character* charact
 	character2->setPosition(c2x, c2y);
 
 
+}
+
+void GameState::moveCharacterAwayFromPosition(Character * character, sf::Vector2f position, float multiplier)
+{
+	// Distance between ball centers
+	float fDistance = Utils::distance(character->getPosition(), position);
+
+	// Calculate displacement required
+	float fOverlap = 0.5f * (fDistance - CHARACTER_RADIUS - CHARACTER_RADIUS);
+
+	// Displace Current Ball away from collision
+	float c1x = character->getX() - fOverlap * (character->getX() - position.x) / fDistance;
+	float c1y = character->getY() - fOverlap * (character->getY() - position.y) / fDistance;
+	character->setPosition(c1x, c1y);
+	
+}
+
+bool GameState::entityIsInPlayerFieldOfView(sf::Vector2f entity)
+{
+	float distance = Utils::distance(entity, player.getPosition());
+	if (distance < mainView.getSize().x/2.0f) {
+
+		sf::Vector2f p1 = entity;
+		sf::Vector2f p2 = player.getPosition();
+		sf::Vector2f p3 = entity;
+
+		float deltaX = p1.x - p2.x;
+		float deltaY = p1.y - p2.y;
+		float speed = 2;
+		float angle = atan2(deltaY, deltaX);
+		while (this->_data->map.isEntityInMapBounds(p3)) {
+			if (Utils::distance(p3, p2) < speed) {
+				return true;
+			}
+			p3.x = p3.x - cos(angle)*speed;
+			p3.y = p3.y - sin(angle)*speed;
+			if (!this->_data->map.isEntityOnPathCell(p3)) {
+				return false;
+			}
+		}
+	}
+	return false;
 }
 

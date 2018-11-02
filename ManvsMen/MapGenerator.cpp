@@ -51,6 +51,8 @@ MapGenerator::MapGenerator(size_t width, size_t height, size_t blocWidth, size_t
 		}
 		removeDiagonal();
 
+		optimizeRendering();
+
 	}
 
 }
@@ -60,7 +62,7 @@ Point MapGenerator::getRandomPathPoint() {
 	while (!pointCorrect) {
 		int x = rand() % width;
 		int y = rand() % height;
-		if (matrix[x][y] > 0) {
+		if (matrix[x][y] == PATH) {
 			point.x = x;
 			point.y = y;
 			return point;
@@ -96,7 +98,7 @@ Point MapGenerator::getRandomPathPointOutRange(int range,Point point) {
 		tries++;
 		int x = rand() % width;
 		int y = rand() % height;
-		if (matrix[x][y] > 0 && Utils::distance(Utils::getVector2fFromPoint(point), sf::Vector2f(x,y))>range) {
+		if (matrix[x][y] ==PATH && Utils::distance(Utils::getVector2fFromPoint(point), sf::Vector2f(x,y))>range) {
 			return Point(x, y);
 		}
 	}
@@ -142,7 +144,7 @@ void MapGenerator::addAdjToSameTree(int x, int y, int **visitedMatrix, int curre
 		int cellValue = x%width + y * width;
 		tree.insert(cellValue, roots[currentTree]);
 		visitedMatrix[x][y] = 1;
-		for each (Point var in getNeighbours(Point(x, y)))
+		for (Point var : getNeighbours(Point(x, y)))
 		{
 			addAdjToSameTree(var.x, var.y, visitedMatrix, currentTree);
 		}
@@ -177,23 +179,35 @@ void MapGenerator::removeDiagonal()
 			if (matrix[i][j] == 1) {
 				if (matrix[i - 1][j - 1] == 1 && matrix[i - 1][j] == 0 && matrix[i][j - 1] == 0) {
 					matrix[i][j] = 0;
-					std::cout << i << " " << j << std::endl;
 				}
 				else if (matrix[i + 1][j - 1] == 1 && matrix[i + 1][j] == 0 && matrix[i][j - 1] == 0) {
 					matrix[i][j] = 0;
-					std::cout << i << " " << j << std::endl;
 
 				}
 				else if (matrix[i + 1][j + 1] == 1 && matrix[i + 1][j] == 0 && matrix[i][j + 1] == 0){
 					matrix[i][j] = 0;
-					std::cout << i << " " << j << std::endl;
 
 				}
 				else if (matrix[i - 1][j + 1] == 1 && matrix[i - 1][j] == 0 && matrix[i][j + 1] == 0) {
 					matrix[i][j] = 0;
-					std::cout << i << " " << j << std::endl;
-
 				}
+			}
+		}
+	}
+}
+
+void MapGenerator::optimizeRendering()
+{
+	for (int i = 1; i < width-1; i++) {
+		for (int j = 1; j < height-1; j++) {
+			if (matrix[i][j] == WALL) {
+				if ((matrix[i - 1][j] == WALL || matrix[i - 1][j] == CONCRETE) &&
+					(matrix[i + 1][j] == WALL || matrix[i + 1][j] == CONCRETE) &&
+					(matrix[i][j + 1] == WALL || matrix[i][j + 1] == CONCRETE) &&
+					(matrix[i][j - 1] == WALL || matrix[i][j - 1] == CONCRETE)) {
+					matrix[i][j] = CONCRETE;
+				}
+
 			}
 		}
 	}
@@ -211,7 +225,7 @@ bool MapGenerator::isPositionAPath(Point p) {
 Point MapGenerator::getFirstPathCellTopLeft() {
 	Point p(0, 0);
 	int i = 0;
-	while (matrix[p.x][p.y]==WALL) {
+	while (matrix[p.x][p.y]==WALL || matrix[p.x][p.y] == CONCRETE) {
 		if (i % 2 == 0) {
 			p.x += 1;
 		}

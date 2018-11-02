@@ -1,6 +1,7 @@
 #pragma once
 #include "SFML\Graphics.hpp"
 #include "Game.h"
+#include "DEFINITIONS.h"
 
 class TileMap : public sf::Drawable,public sf::Transformable
 {

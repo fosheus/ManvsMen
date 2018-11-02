@@ -15,12 +15,24 @@ void StateMachine::RemoveState()
 	this->_isRemoving = true;
 }
 
+void StateMachine::RemoveCurrentLastPausedState()
+{
+	this->_isRemoving = true;
+	this->_isRemovingPaused = true;
+}
+
 void StateMachine::ProcessStateChanges()
 {
 	if (this->_isRemoving && !this->_states.empty()) {
 		this->_states.pop();
-		if (!this->_states.empty()) {
+		if (!this->_states.empty() && !this->_isRemovingPaused) {
 			this->_states.top()->Resume();
+		}
+		else if (!this->_states.empty() && this->_isRemovingPaused) {
+			this->_states.pop();
+			if (!this->_states.empty()) {
+				this->_states.top()->Resume();
+			}
 		}
 		this->_isRemoving = false;
 	}

@@ -37,6 +37,11 @@ bool TileMap::load(sf::Vector2u tileSize, int ** matrix, unsigned int width, uns
 			quad[2].texCoords = sf::Vector2f((float)(tu + 1)*tileSize.x, (float)(tv + 1)*tileSize.y);
 			quad[3].texCoords = sf::Vector2f((float)tu*tileSize.x, (float)(tv + 1)*tileSize.y);
 
+			quad[0].color = sf::Color(128, 128, 128);
+			quad[1].color = sf::Color(128, 128, 128);
+			quad[2].color = sf::Color(128, 128, 128);
+			quad[3].color = sf::Color(128, 128, 128);
+
 		}
 		
 	}

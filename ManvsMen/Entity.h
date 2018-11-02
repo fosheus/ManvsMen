@@ -28,6 +28,7 @@ public:
 	sf::Sprite getSprite() { return sprite; }
 	sf::RectangleShape getMinBounds();
 	void update(float multiplier);
+	const sf::Vector2f& getPosition() { return sprite.getPosition(); }
 	virtual Entity* pickedBy(Character* character) = 0;
 	virtual Entity::EntityType getEntityType() = 0;
 	virtual ~Entity()=0;

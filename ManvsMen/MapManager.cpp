@@ -105,6 +105,11 @@ sf::Vector2f MapManager::getRandomPathPointInOrOutRange(float range,bool inRange
 	p = map->getWorldPosition(p);
 	return sf::Vector2f(p.x, p.y);
 }
+sf::Vector2f MapManager::getMatrixPosToRealPos(sf::Vector2f mapPosition)
+{
+	Point p =map->getWorldPosition(map->getMapPosition(Point(mapPosition.x, mapPosition.y)));
+	return sf::Vector2f(p.x, p.y);
+}
 std::vector<sf::Vector2f> MapManager::getSafePoints(sf::Vector2f entityPos, sf::Vector2f enemysEntityPos) {
 	float distanceFromThis;
 	float distanceFromPlayer;
