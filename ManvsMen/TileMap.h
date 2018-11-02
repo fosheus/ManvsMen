@@ -15,6 +15,6 @@ private:
 public:
 	TileMap(GameDataRef data);
 	~TileMap();
-	bool load(sf::Vector2u tileSize, int ** matrix, unsigned int width, unsigned int height,sf::Vector2f referencePos);
+	bool load(sf::Vector2u tileSize, int ** matrix, unsigned int width, unsigned int height);
 };
 

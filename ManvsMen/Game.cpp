@@ -14,7 +14,7 @@ Game::Game(std::string settingsFileName)
 
 
 	this->_data->window.create(sf::VideoMode(_data->config.width, _data->config.height), GAME_NAME, sf::Style::Close | sf::Style::Titlebar| (sf::Style::Fullscreen*_data->config.fullscreen),settings);
-	
+	this->_data->window.setVerticalSyncEnabled(true);
 
 	this->_data->machine.AddState(StateRef(new SplashState(this->_data)));
 

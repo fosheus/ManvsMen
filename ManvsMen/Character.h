@@ -19,7 +19,7 @@
 #define TEXTURE_CENTER sf::Vector2f(96,120)
 #define TEXTURE_NUMBER 2
 #define TEXTURE_TOP_LEFT_OFFSET sf::Vector2f((35.0f-TEXTURE_CENTER.x)*TEXTURE_SCALE,(35.0f-TEXTURE_CENTER.y)*TEXTURE_SCALE)
-#define TEXTURE_WEAPON_POINT_OFFSET sf::Vector2f((291.0f-TEXTURE_CENTER.x)*TEXTURE_SCALE,(150.0f-TEXTURE_CENTER.y)*TEXTURE_SCALE)
+#define TEXTURE_WEAPON_POINT_OFFSET sf::Vector2f((180.0f-TEXTURE_CENTER.x)*TEXTURE_SCALE,(150.0f-TEXTURE_CENTER.y)*TEXTURE_SCALE)
 #define TEXTURE_HITBOX_SIZE sf::Vector2f(205.0f*TEXTURE_SCALE,155.0f*TEXTURE_SCALE)
 #define BULLETSHAPE_WIDTH 30
 #define BULLETSHAPE_HEIGHT 6
@@ -113,7 +113,7 @@ public:
 	bool isShooting() { return shooting; }
 	bool isAiming() { return aiming; }
 
-	sf::Vector2f getPosition() { return sf::Vector2f(x, y); }
+	const sf::Vector2f& getPosition() { return sf::Vector2f(x, y); }
 	void setPosition(sf::Vector2f position) { x = position.x; y = position.y; }
 	void setPosition(float x, float y);
 	void setRotation(float angle);

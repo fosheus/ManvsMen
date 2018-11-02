@@ -175,6 +175,7 @@
     <ClCompile Include="GameState.cpp" />
     <ClCompile Include="GunWeapon.cpp" />
     <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="IntersectionPoint.cpp" />
     <ClCompile Include="KevlarEntity.cpp" />
     <ClCompile Include="KeyBindingManager.cpp" />
     <ClCompile Include="KeyConversionManager.cpp" />
@@ -191,6 +192,7 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Point.cpp" />
     <ClCompile Include="RifleWeapon.cpp" />
+    <ClCompile Include="Segment.cpp" />
     <ClCompile Include="SelectWeaponState.cpp" />
     <ClCompile Include="SettingsParser.cpp" />
     <ClCompile Include="ShotgunWeapon.cpp" />
@@ -199,6 +201,7 @@
     <ClCompile Include="StateMachine.cpp" />
     <ClCompile Include="TileMap.cpp" />
     <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="Vector2fComparator.cpp" />
     <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="WeaponEntity.cpp" />
   </ItemGroup>
@@ -218,6 +221,7 @@
     <ClInclude Include="GameState.h" />
     <ClInclude Include="GunWeapon.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="IntersectionPoint.h" />
     <ClInclude Include="KevlarEntity.h" />
     <ClInclude Include="KeyBindingManager.h" />
     <ClInclude Include="KeyConversionManager.h" />
@@ -233,6 +237,7 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="RifleWeapon.h" />
+    <ClInclude Include="Segment.h" />
     <ClInclude Include="SelectWeaponState.h" />
     <ClInclude Include="SettingsParser.h" />
     <ClInclude Include="ShotgunWeapon.h" />
@@ -242,6 +247,7 @@
     <ClInclude Include="StateMachine.h" />
     <ClInclude Include="TileMap.h" />
     <ClInclude Include="Utils.h" />
+    <ClInclude Include="Vector2fComparator.h" />
     <ClInclude Include="Weapon.h" />
     <ClInclude Include="WeaponEntity.h" />
   </ItemGroup>

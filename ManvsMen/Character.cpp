@@ -301,8 +301,8 @@ std::vector<Bullet>& Character::getBullets() {
 	if (weapon) {
 		return weapon->getBullets();
 	} 
-
-	 return std::vector<Bullet>();
+	std::vector<Bullet> empty;
+	return empty;
 }
 size_t Character::getBulletNumber() {
 	if (weapon) {

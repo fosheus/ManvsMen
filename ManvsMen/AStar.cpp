@@ -24,7 +24,7 @@ bool operator==(const AStar::Node &n1, const AStar::Node &n2) {
 bool pointInBoundsAndNotWall(Point p1, int** map, int width, int height) {
 	if (p1.x >= 0 && p1.x < width) {
 		if (p1.y >= 0 && p1.y < height) {
-			if (map[p1.x][p1.y] != 0) {
+			if (map[p1.x][p1.y] == 1) {
 				return true;
 			}
 		}
