@@ -171,6 +171,7 @@ void GameState::Draw(float dt)
 	//CLEAR AND SET WINDOW//
 	mainView.setCenter(player.getPosition());
 	this->_data->window.clear();
+
 	this->_data->window.setView(mainView);
 
 	
